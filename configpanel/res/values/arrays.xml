@@ -23,6 +23,7 @@
         <item>@string/notification_slider_mode_none</item>
         <item>@string/notification_slider_mode_vibrate</item>
         <item>@string/notification_slider_mode_ring</item>
+
     </string-array>
 
     <string-array name="notification_slider_action_entry_values" translatable="false">
