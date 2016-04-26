@@ -21,6 +21,8 @@ import android.os.SystemProperties;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.SwitchPreference;
+import android.preference.ListPreference;
+import android.preference.Preference;
 
 import com.cyanogenmod.settings.device.utils.Constants;
 import com.cyanogenmod.settings.device.utils.FileUtils;
@@ -29,6 +31,7 @@ import com.cyanogenmod.settings.device.utils.NodePreferenceActivity;
 import org.cyanogenmod.internal.util.ScreenType;
 
 public class ButtonSettings extends NodePreferenceActivity {
+
     private static final String KEY_IGNORE_AUTO = "notification_slider_ignore_auto";
     private static final String PROP_IGNORE_AUTO = "persist.op.slider_ignore_auto";
 
@@ -60,5 +63,6 @@ public class ButtonSettings extends NodePreferenceActivity {
         super.onResume();
 
         mIgnoreAuto.setChecked(SystemProperties.get(PROP_IGNORE_AUTO).equals("true"));
+
     }
 }
