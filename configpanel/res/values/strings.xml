@@ -83,6 +83,4 @@
     <string name="notification_slider_mode_none">All notifications</string>
     <string name="notification_slider_mode_vibrate">Vibrate</string>
     <string name="notification_slider_mode_ring">Ring</string>
-    <string name="notification_slider_mode_none">None</string>
-
 </resources>
