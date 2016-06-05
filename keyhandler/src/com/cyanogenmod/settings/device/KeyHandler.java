@@ -30,12 +30,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraManager;
-<<<<<<< HEAD
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraAccessException;
-=======
-import android.media.AudioManager;
->>>>>>> 26ec5f7... Notification slider: add extra options
 import android.media.session.MediaSessionLegacyHelper;
 import android.net.Uri;
 import android.os.Handler;
@@ -45,11 +41,8 @@ import android.os.PowerManager.WakeLock;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
-<<<<<<< HEAD
 import android.os.UserHandle;
-=======
 import android.os.SystemProperties;
->>>>>>> 26ec5f7... Notification slider: add extra options
 import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.provider.Settings;
