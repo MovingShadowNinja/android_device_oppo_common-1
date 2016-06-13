@@ -17,15 +17,7 @@
 package com.cyanogenmod.settings.device;
 
 import android.os.Bundle;
-import android.os.SystemProperties;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.SwitchPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
 
-import com.cyanogenmod.settings.device.utils.Constants;
-import com.cyanogenmod.settings.device.utils.FileUtils;
 import com.cyanogenmod.settings.device.utils.NodePreferenceActivity;
 
 import org.cyanogenmod.internal.util.ScreenType;
