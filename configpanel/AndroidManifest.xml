@@ -31,7 +31,7 @@
 
     <application
         android:icon="@mipmap/ic_launcher_settings"
-        android:label="@*cyanogenmod.platform:string/device_settings_app_name"
+        android:label="@string/app_name"
         android:theme="@style/Theme.Main">
 
         <!-- stub to ensure its loaded - DO NOT REMOVE -->
