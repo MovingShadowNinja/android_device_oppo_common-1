@@ -16,13 +16,10 @@
 
 package com.cyanogenmod.settings.device;
 
-<<<<<<< HEAD
 import android.app.ActivityManagerNative;
 import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
-=======
->>>>>>> cm-13.0
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -33,11 +30,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
-<<<<<<< HEAD
-=======
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
->>>>>>> cm-13.0
 import android.media.AudioManager;
 import android.media.session.MediaSessionLegacyHelper;
 import android.os.Handler;
@@ -45,10 +39,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
-<<<<<<< HEAD
 import android.os.UserHandle;
-=======
->>>>>>> cm-13.0
 import android.os.SystemProperties;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -56,15 +47,11 @@ import android.service.notification.ZenModeConfig;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
-<<<<<<< HEAD
+
 import android.view.WindowManagerGlobal;
-=======
->>>>>>> cm-13.0
 
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.util.ArrayUtils;
-
-import cyanogenmod.providers.CMSettings;
 
 public class KeyHandler implements DeviceKeyHandler {
 
@@ -111,10 +98,7 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private final Context mContext;
     private final PowerManager mPowerManager;
-<<<<<<< HEAD
     private KeyguardManager mKeyguardManager;
-=======
->>>>>>> cm-13.0
     private final AudioManager mAudioManager;
     private final NotificationManager mNotificationManager;
     private EventHandler mEventHandler;
@@ -239,8 +223,8 @@ public class KeyHandler implements DeviceKeyHandler {
     }
 
     private boolean hasSetupCompleted() {
-        return CMSettings.Secure.getInt(mContext.getContentResolver(),
-            CMSettings.Secure.CM_SETUP_WIZARD_COMPLETED, 0) != 0;
+        return Settings.Secure.getInt(mContext.getContentResolver(),
+            Settings.Secure.CM_SETUP_WIZARD_COMPLETED, 0) != 0;
     }
 
     public boolean handleKeyEvent(KeyEvent event) {
@@ -353,8 +337,8 @@ public class KeyHandler implements DeviceKeyHandler {
         if (mVibrator == null) {
             return;
         }
-        boolean enabled = CMSettings.System.getInt(mContext.getContentResolver(),
-                CMSettings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
+        boolean enabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
         if (enabled) {
             mVibrator.vibrate(50);
         }
