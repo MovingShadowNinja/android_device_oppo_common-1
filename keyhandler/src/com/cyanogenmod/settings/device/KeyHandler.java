@@ -16,6 +16,10 @@
 
 package com.cyanogenmod.settings.device;
 
+import android.app.ActivityManagerNative;
+import android.app.KeyguardManager;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -35,6 +39,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
+import android.os.UserHandle;
 import android.os.SystemProperties;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -43,10 +48,10 @@ import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.KeyEvent;
 
+import android.view.WindowManagerGlobal;
+
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.util.ArrayUtils;
-
-import cyanogenmod.providers.CMSettings;
 
 public class KeyHandler implements DeviceKeyHandler {
 
@@ -93,6 +98,7 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private final Context mContext;
     private final PowerManager mPowerManager;
+    private KeyguardManager mKeyguardManager;
     private final AudioManager mAudioManager;
     private final NotificationManager mNotificationManager;
     private EventHandler mEventHandler;
@@ -119,9 +125,9 @@ public class KeyHandler implements DeviceKeyHandler {
 
         final Resources resources = mContext.getResources();
         mProximityTimeOut = resources.getInteger(
-                org.cyanogenmod.platform.internal.R.integer.config_proximityCheckTimeout);
+                com.android.internal.R.integer.config_proximityCheckTimeout);
         mProximityWakeSupported = resources.getBoolean(
-                org.cyanogenmod.platform.internal.R.bool.config_proximityCheckOnWake);
+                com.android.internal.R.bool.config_proximityCheckOnWake);
 
         if (mProximityWakeSupported) {
             mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -217,8 +223,8 @@ public class KeyHandler implements DeviceKeyHandler {
     }
 
     private boolean hasSetupCompleted() {
-        return CMSettings.Secure.getInt(mContext.getContentResolver(),
-            CMSettings.Secure.CM_SETUP_WIZARD_COMPLETED, 0) != 0;
+        return Settings.Secure.getInt(mContext.getContentResolver(),
+            Settings.Secure.CM_SETUP_WIZARD_COMPLETED, 0) != 0;
     }
 
     public boolean handleKeyEvent(KeyEvent event) {
@@ -226,10 +232,12 @@ public class KeyHandler implements DeviceKeyHandler {
         boolean isKeySupported = ArrayUtils.contains(sSupportedGestures, scanCode);
         boolean isSliderModeSupported = sSupportedSliderModes.indexOfKey(scanCode) >= 0;
         if (!isKeySupported && !isSliderModeSupported) {
+
             return false;
         }
 
         if (!hasSetupCompleted()) {
+
             return false;
         }
 
@@ -269,9 +277,9 @@ public class KeyHandler implements DeviceKeyHandler {
         } else if (!mEventHandler.hasMessages(GESTURE_REQUEST)) {
             Message msg = getMessageForKeyEvent(scanCode);
             boolean defaultProximity = mContext.getResources().getBoolean(
-                org.cyanogenmod.platform.internal.R.bool.config_proximityCheckOnWakeEnabledByDefault);
-            boolean proximityWakeCheckEnabled = CMSettings.System.getInt(mContext.getContentResolver(),
-                    CMSettings.System.PROXIMITY_ON_WAKE, defaultProximity ? 1 : 0) == 1;
+                com.android.internal.R.bool.config_proximityCheckOnWakeEnabledByDefault);
+            boolean proximityWakeCheckEnabled = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.PROXIMITY_ON_WAKE, defaultProximity ? 1 : 0) == 1;
             if (mProximityWakeSupported && proximityWakeCheckEnabled && mProximitySensor != null) {
                 mEventHandler.sendMessageDelayed(msg, mProximityTimeOut);
                 processEvent(scanCode);
@@ -329,8 +337,8 @@ public class KeyHandler implements DeviceKeyHandler {
         if (mVibrator == null) {
             return;
         }
-        boolean enabled = CMSettings.System.getInt(mContext.getContentResolver(),
-                CMSettings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
+        boolean enabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
         if (enabled) {
             mVibrator.vibrate(50);
         }

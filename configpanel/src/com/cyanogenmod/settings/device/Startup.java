@@ -93,6 +93,7 @@ public class Startup extends BroadcastReceiver {
 
                 // Set doubleTap event
                 toggleDoubleTap(context, sInstance, Constants.isPreferenceEnabled(
+
                         context, Constants.TOUCHPAD_DOUBLETAP_KEY));
             }
 
