@@ -33,6 +33,7 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.preference.PreferenceManager;
+import android.service.gesture.IGestureService;
 import android.util.Log;
 import android.view.InputDevice;
 import android.view.InputEvent;
@@ -50,7 +51,8 @@ public class Startup extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+        final String action = intent.getAction();
+        if (cyanogenmod.content.Intent.ACTION_INITIALIZE_CM_HARDWARE.equals(action)) {
             // Disable touchscreen gesture settings if needed
             if (!hasTouchscreenGestures()) {
                 disableComponent(context, TouchscreenGestureSettings.class.getName());
@@ -75,12 +77,21 @@ public class Startup extends BroadcastReceiver {
                 IBinder b = ServiceManager.getService("gesture");
                 IGestureService sInstance = IGestureService.Stub.asInterface(b);
 
+                boolean value = Constants.isPreferenceEnabled(context,
+                        Constants.TOUCHPAD_STATE_KEY);
+                String node = Constants.sBooleanNodePreferenceMap.get(
+                        Constants.TOUCHPAD_STATE_KEY);
+                if (!FileUtils.writeLine(node, value ? "1" : "0")) {
+                    Log.w(TAG, "Write to node " + node +
+                            " failed while restoring touchpad enable state");
+                }
+
                 // Set longPress event
                 toggleLongPress(context, sInstance, Constants.isPreferenceEnabled(
                         context, Constants.TOUCHPAD_LONGPRESS_KEY));
 
                 // Set doubleTap event
-                toggleLongPress(context, sInstance, Constants.isPreferenceEnabled(
+                toggleDoubleTap(context, sInstance, Constants.isPreferenceEnabled(
                         context, Constants.TOUCHPAD_DOUBLETAP_KEY));
             }
 
