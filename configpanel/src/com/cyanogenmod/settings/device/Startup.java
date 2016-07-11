@@ -32,6 +32,7 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.UserHandle;
+import android.service.gesture.IGestureService;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.InputDevice;
@@ -41,7 +42,6 @@ import android.view.KeyEvent;
 
 import java.io.File;
 
-import com.cyanogenmod.settings.device.utils.IGestureService;
 import com.cyanogenmod.settings.device.utils.Constants;
 import com.cyanogenmod.settings.device.utils.FileUtils;
 

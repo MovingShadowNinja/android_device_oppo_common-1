@@ -17,15 +17,15 @@
 package com.cyanogenmod.settings.device;
 
 import com.cyanogenmod.settings.device.utils.ScreenType;
+
 import com.cyanogenmod.settings.device.utils.Constants;
 import com.cyanogenmod.settings.device.utils.NodePreferenceActivity;
-import com.cyanogenmod.settings.device.utils.IGestureService;
 
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ServiceManager;
 import android.preference.Preference;
-
+import android.service.gesture.IGestureService;
 
 public class GesturePadSettings extends NodePreferenceActivity {
 
