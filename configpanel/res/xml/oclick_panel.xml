@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2015 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License"
@@ -16,44 +15,43 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference
-        android:key="oclick_connect" />
+    <Preference android:key="oclick_connect" />
 
     <PreferenceCategory
-        android:key="oclick_action_category"
         android:enabled="false"
+        android:key="oclick_action_category"
         android:title="@string/action_category_title">
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="oclick_take_snapshot"
-            android:title="@string/oclick_take_snapshot_title"
-            android:summary="@string/oclick_take_snapshot_summary" />
+            android:summary="@string/oclick_take_snapshot_summary"
+            android:title="@string/oclick_take_snapshot_title" />
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="oclick_find_my_phone"
-            android:title="@string/oclick_find_my_phone_title"
-            android:summary="@string/oclick_find_my_phone_summary" />
+            android:summary="@string/oclick_find_my_phone_summary"
+            android:title="@string/oclick_find_my_phone_title" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="oclick_alert_category"
         android:enabled="false"
+        android:key="oclick_alert_category"
         android:title="@string/alert_category_title">
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="oclick_fence"
-            android:title="@string/oclick_fence_title"
-            android:summary="@string/oclick_fence_summary"  />
+            android:summary="@string/oclick_fence_summary"
+            android:title="@string/oclick_fence_title" />
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="oclick_disconnect_alert"
-            android:title="@string/oclick_disconnect_alert_title"
-            android:summary="@string/oclick_disconnect_alert_summary" />
+            android:summary="@string/oclick_disconnect_alert_summary"
+            android:title="@string/oclick_disconnect_alert_title" />
 
     </PreferenceCategory>
 

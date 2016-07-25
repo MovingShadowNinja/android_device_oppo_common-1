@@ -40,14 +40,50 @@ import android.view.InputEvent;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 
-import java.io.File;
-
 import com.cyanogenmod.settings.device.utils.Constants;
 import com.cyanogenmod.settings.device.utils.FileUtils;
+
+import java.io.File;
 
 public class Startup extends BroadcastReceiver {
 
     private static final String TAG = Startup.class.getSimpleName();
+
+    public static void toggleDoubleTap(Context context, IGestureService gestureService,
+                                       boolean enable) {
+        PendingIntent pendingIntent = null;
+        if (enable) {
+            Intent doubleTapIntent = new Intent("cyanogenmod.intent.action.GESTURE_CAMERA", null);
+            pendingIntent = PendingIntent.getBroadcastAsUser(
+                    context, 0, doubleTapIntent, 0, UserHandle.CURRENT);
+        }
+        try {
+            System.out.println("toggleDoubleTap : " + pendingIntent);
+            gestureService.setOnDoubleClickPendingIntent(pendingIntent);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void toggleLongPress(Context context, IGestureService gestureService,
+                                       boolean enable) {
+        PendingIntent pendingIntent = null;
+        if (enable) {
+            Intent longPressIntent = new Intent(Intent.ACTION_CAMERA_BUTTON, null);
+            pendingIntent = PendingIntent.getBroadcastAsUser(
+                    context, 0, longPressIntent, 0, UserHandle.CURRENT);
+        }
+        try {
+            System.out.println("toggleLongPress : " + pendingIntent);
+            gestureService.setOnLongPressPendingIntent(pendingIntent);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean hasOClick() {
+        return Build.MODEL.equals("N1") || Build.MODEL.equals("N3");
+    }
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
@@ -63,14 +99,14 @@ public class Startup extends BroadcastReceiver {
                     String node = Constants.sBooleanNodePreferenceMap.get(pref);
                     if (!FileUtils.writeLine(node, value ? "1" : "0")) {
                         Log.w(TAG, "Write to node " + node +
-                            " failed while restoring saved preference values");
+                                " failed while restoring saved preference values");
                     }
                 }
             }
 
             // Disable backtouch settings if needed
             if (!context.getResources().getBoolean(
-                        com.android.internal.R.bool.config_enableGestureService)) {
+                    com.android.internal.R.bool.config_enableGestureService)) {
                 disableComponent(context, GesturePadSettings.class.getName());
             } else {
                 IBinder b = ServiceManager.getService("gesture");
@@ -105,7 +141,7 @@ public class Startup extends BroadcastReceiver {
                     }
                     if (!FileUtils.writeLine(node, value)) {
                         Log.w(TAG, "Write to node " + node +
-                            " failed while restoring saved preference values");
+                                " failed while restoring saved preference values");
                     }
                 }
             }
@@ -126,40 +162,8 @@ public class Startup extends BroadcastReceiver {
             sendInputEvent(new KeyEvent(now, now, KeyEvent.ACTION_DOWN,
                     KeyEvent.KEYCODE_CAMERA, 0, 0,
                     KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD));
-            sendInputEvent(new KeyEvent(now, now, KeyEvent.ACTION_UP,KeyEvent.KEYCODE_CAMERA,
+            sendInputEvent(new KeyEvent(now, now, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_CAMERA,
                     0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD));
-        }
-    }
-
-    public static void toggleDoubleTap(Context context, IGestureService gestureService,
-            boolean enable) {
-        PendingIntent pendingIntent = null;
-        if (enable) {
-            Intent doubleTapIntent = new Intent("cyanogenmod.intent.action.GESTURE_CAMERA", null);
-            pendingIntent = PendingIntent.getBroadcastAsUser(
-                    context, 0, doubleTapIntent, 0, UserHandle.CURRENT);
-        }
-        try {
-            System.out.println("toggleDoubleTap : " + pendingIntent);
-            gestureService.setOnDoubleClickPendingIntent(pendingIntent);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void toggleLongPress(Context context, IGestureService gestureService,
-            boolean enable) {
-        PendingIntent pendingIntent = null;
-        if (enable) {
-            Intent longPressIntent = new Intent(Intent.ACTION_CAMERA_BUTTON, null);
-            pendingIntent = PendingIntent.getBroadcastAsUser(
-                    context, 0, longPressIntent, 0, UserHandle.CURRENT);
-        }
-        try {
-            System.out.println("toggleLongPress : " + pendingIntent);
-            gestureService.setOnLongPressPendingIntent(pendingIntent);
-        } catch (RemoteException e) {
-            e.printStackTrace();
         }
     }
 
@@ -171,15 +175,15 @@ public class Startup extends BroadcastReceiver {
 
     private boolean hasTouchscreenGestures() {
         return new File(Constants.TOUCHSCREEN_CAMERA_NODE).exists() &&
-            new File(Constants.TOUCHSCREEN_MUSIC_NODE).exists() &&
-            new File(Constants.TOUCHSCREEN_FLASHLIGHT_NODE).exists();
+                new File(Constants.TOUCHSCREEN_MUSIC_NODE).exists() &&
+                new File(Constants.TOUCHSCREEN_FLASHLIGHT_NODE).exists();
     }
 
     private boolean hasButtonProcs() {
         return (new File(Constants.NOTIF_SLIDER_TOP_NODE).exists() &&
-            new File(Constants.NOTIF_SLIDER_MIDDLE_NODE).exists() &&
-            new File(Constants.NOTIF_SLIDER_BOTTOM_NODE).exists()) ||
-            new File(Constants.BUTTON_SWAP_NODE).exists();
+                new File(Constants.NOTIF_SLIDER_MIDDLE_NODE).exists() &&
+                new File(Constants.NOTIF_SLIDER_BOTTOM_NODE).exists()) ||
+                new File(Constants.BUTTON_SWAP_NODE).exists();
     }
 
     private void disableComponent(Context context, String component) {
@@ -199,10 +203,6 @@ public class Startup extends BroadcastReceiver {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                     PackageManager.DONT_KILL_APP);
         }
-    }
-
-    private static boolean hasOClick() {
-        return Build.MODEL.equals("N1") || Build.MODEL.equals("N3");
     }
 
     private void updateOClickServiceState(Context context) {

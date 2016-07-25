@@ -17,17 +17,17 @@
 package com.cyanogenmod.settings.device.utils;
 
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.preference.ListPreference;
 import android.preference.SwitchPreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import java.io.File;
+import org.cyanogenmod.internal.util.ScreenType;
 
-import com.cyanogenmod.settings.device.utils.ScreenType;
+import java.io.File;
 
 public class NodePreferenceActivity extends PreferenceActivity
         implements OnPreferenceChangeListener {
@@ -96,10 +96,10 @@ public class NodePreferenceActivity extends PreferenceActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        // Respond to the action bar's Up/Home button
-        case android.R.id.home:
-            finish();
-            return true;
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

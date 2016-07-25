@@ -19,10 +19,10 @@ package com.cyanogenmod.settings.device.utils;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 
 public final class FileUtils {
     private static final String TAG = "FileUtils";

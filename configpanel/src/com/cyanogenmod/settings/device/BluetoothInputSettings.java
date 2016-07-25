@@ -31,12 +31,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelUuid;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -75,6 +75,7 @@ public class BluetoothInputSettings extends PreferenceActivity {
         public void onScanFailed(int errorCode) {
             stopScanning();
         }
+
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             handleScanResult(result);
@@ -118,10 +119,10 @@ public class BluetoothInputSettings extends PreferenceActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        // Respond to the action bar's Up/Home button
-        case android.R.id.home:
-            finish();
-            return true;
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

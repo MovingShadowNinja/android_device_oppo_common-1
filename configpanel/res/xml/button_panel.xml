@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2016 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,40 +17,39 @@
 
     <SwitchPreference
         android:key="button_swap"
-        android:title="@string/button_swap_title"
-        android:summary="@string/button_swap_summary" />
+        android:summary="@string/button_swap_summary"
+        android:title="@string/button_swap_title" />
 
-    <PreferenceCategory
-        android:title="@string/notification_slider_category_title">
+    <PreferenceCategory android:title="@string/notification_slider_category_title">
 
         <SwitchPreference
             android:key="notification_slider_ignore_auto"
-            android:title="@string/notification_slider_ignore_auto_title"
-            android:summary="@string/notification_slider_ignore_auto_summary" />
+            android:summary="@string/notification_slider_ignore_auto_summary"
+            android:title="@string/notification_slider_ignore_auto_title" />
 
         <ListPreference
+            android:dialogTitle="@string/notification_slider_selection_dialog_title"
+            android:entries="@array/notification_slider_action_entries"
+            android:entryValues="@array/notification_slider_action_entry_values"
             android:key="keycode_top_position"
-            android:dialogTitle="@string/notification_slider_selection_dialog_title"
-            android:title="@string/notification_slider_top_position"
             android:summary="%s"
-            android:entries="@array/notification_slider_action_entries"
-            android:entryValues="@array/notification_slider_action_entry_values" />
+            android:title="@string/notification_slider_top_position" />
 
         <ListPreference
+            android:dialogTitle="@string/notification_slider_selection_dialog_title"
+            android:entries="@array/notification_slider_action_entries"
+            android:entryValues="@array/notification_slider_action_entry_values"
             android:key="keycode_middle_position"
-            android:dialogTitle="@string/notification_slider_selection_dialog_title"
-            android:title="@string/notification_slider_middle_position"
             android:summary="%s"
-            android:entries="@array/notification_slider_action_entries"
-            android:entryValues="@array/notification_slider_action_entry_values" />
+            android:title="@string/notification_slider_middle_position" />
 
         <ListPreference
-          android:key="keycode_bottom_position"
-          android:dialogTitle="@string/notification_slider_selection_dialog_title"
-          android:title="@string/notification_slider_bottom_position"
-          android:summary="%s"
-          android:entries="@array/notification_slider_action_entries"
-          android:entryValues="@array/notification_slider_action_entry_values" />
+            android:dialogTitle="@string/notification_slider_selection_dialog_title"
+            android:entries="@array/notification_slider_action_entries"
+            android:entryValues="@array/notification_slider_action_entry_values"
+            android:key="keycode_bottom_position"
+            android:summary="%s"
+            android:title="@string/notification_slider_bottom_position" />
 
     </PreferenceCategory>
 

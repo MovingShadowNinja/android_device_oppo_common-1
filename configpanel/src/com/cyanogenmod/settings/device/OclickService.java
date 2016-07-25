@@ -52,95 +52,33 @@ import java.util.UUID;
 public class OclickService extends Service implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private static final String TAG = OclickService.class.getSimpleName();
-
+    public static final String CANCEL_ALERT_PHONE = "cancel_alert_phone";
     /* package */ static final UUID TRIGGER_SERVICE_UUID =
             UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
+    /* package */ static final UUID OCLICK2_SERVICE_UUID =
+            UUID.fromString("00002200-0000-1000-8000-00805f9b34fb");
+    private static final String TAG = OclickService.class.getSimpleName();
     private static final UUID TRIGGER_CHARACTERISTIC_V1_UUID =
             UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
     private static final UUID TRIGGER_CHARACTERISTIC_V2_UUID =
             UUID.fromString("f000ffe1-0451-4000-b000-000000000000");
-
-    /* package */ static final UUID OCLICK2_SERVICE_UUID =
-            UUID.fromString("00002200-0000-1000-8000-00805f9b34fb");
     private static final UUID OCLICK2_KEY_CHARACTERISTIC_UUID =
             UUID.fromString("00002201-0000-1000-8000-00805f9b34fb");
-
     private static final UUID IMMEDIATE_ALERT_SERVICE_UUID =
             UUID.fromString("00001802-0000-1000-8000-00805f9b34fb"); //0-2
     private static final UUID IMMEDIATE_ALERT_CHARACTERISTIC_UUID =
             UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb");
-
     private static final UUID LINK_LOSS_SERVICE_UUID =
             UUID.fromString("00001803-0000-1000-8000-00805f9b34fb"); //0-3
     private static final UUID LINK_LOSS_CHARACTERISTIC_UUID =
             UUID.fromString("00002a06-0000-1000-8000-00805f9b34fb");
-
-    public static final String CANCEL_ALERT_PHONE = "cancel_alert_phone";
-
     private static final int RSSI_POLL_INTERVAL = 10000;
     private static final int DOUBLE_TAP_TIMEOUT = 1500;
+    private static final int MSG_SINGLE_TAP_TIMEOUT = 1;
+    private static final int MSG_POLL_RSSI = 2;
 
-    private static final class Oclick2Constants {
-        private static final int MSG_CLASS_CALL = 1;
-        private static final int MSG_CLASS_MESSAGE = 2;
-        private static final int MSG_CLASS_LED = 3;
-        private static final int MSG_CLASS_KEY = 5;
-        private static final int MSG_CLASS_CONNECTION = 7;
-        private static final int MSG_CLASS_LINKLOSE = 8;
-        private static final int MSG_CLASS_RSSI = 11;
-
-        /* payload: count (16 bit integer) */
-        private static final int MSG_TYPE_CALL_SET_INCOMING = 1;
-        private static final int MSG_TYPE_CALL_SET_MISSED = 2;
-        private static final int MSG_TYPE_CALL_SET_READ = 3;
-
-        /* payload: count (16 bit integer) */
-        private static final int MSG_TYPE_MESSAGE_UNREAD = 1;
-        private static final int MSG_TYPE_MESSAGE_READ = 2;
-
-        /* payload: color bitmask (1 byte, white = 1, red = 2, green = 4, blue = 8) */
-        private static final int MSG_TYPE_LED_ON = 1;
-        private static final int MSG_TYPE_LED_FLASH = 2;
-        private static final int MSG_TYPE_LED_OFF = 3;
-
-        /* payload:
-         * CONNECTION_INTERVAL_MIN (16 bit integer),
-         * CONNECTION_INTERVAL_MAX (16 bit integer),
-         * CONNECTION_LATENCY (16 bit integer),
-         * SUPERVISION_TIMEOUT (16 bit integer)
-         */
-        private static final int MSG_TYPE_CONNECTION_GET_PARAMS = 1;
-        private static final int MSG_TYPE_CONNECTION_SET_PARAMS = 2;
-
-        /* payload: level (1 byte, off = 0, on = 1) */
-        private static final int MSG_TYPE_LINKLOSE_GET_LEVEL = 1;
-        private static final int MSG_TYPE_LINKLOSE_SET_LEVEL = 2;
-
-        private static final int MSG_TYPE_RSSI_READ_RATE_GET = 1;
-        private static final int MSG_TYPE_RSSI_READ_RATE_SET = 2;
-        private static final int MSG_TYPE_RSSI_GET = 3;
-
-        private static final int KEYCODE_MIDDLE = 0x10;
-        private static final int KEYCODE_UP = 0x20;
-        private static final int KEYCODE_RIGHT = 0x30;
-        private static final int KEYCODE_DOWN = 0x40;
-        private static final int KEYCODE_LEFT = 0x50;
-        private static final int KEYCODE_MASK = 0xf0;
-
-        private static final int KEYTYPE_LONG_RELEASE = 0;
-        private static final int KEYTYPE_SHORT = 1;
-        private static final int KEYTYPE_DOUBLE = 2;
-        private static final int KEYTYPE_LONG_PRESS = 3;
-        private static final int KEYTYPE_MASK = 0xf;
-    }
-
-    private enum ConnectionState {
-        INIT,
-        CONNECTED,
-        RECONNECTING
-    };
-
+    ;
+    private static final int MSG_TRY_RECONNECT = 3;
     private BluetoothDevice mBluetoothDevice;
     private BluetoothGatt mBluetoothGatt;
     private boolean mAlerting;
@@ -150,29 +88,6 @@ public class OclickService extends Service implements
     private Ringtone mRingtone;
     private SharedPreferences mPrefs;
     private ConnectionState mConnectionState;
-
-    private static final int MSG_SINGLE_TAP_TIMEOUT = 1;
-    private static final int MSG_POLL_RSSI = 2;
-    private static final int MSG_TRY_RECONNECT = 3;
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_SINGLE_TAP_TIMEOUT:
-                    injectKey(KeyEvent.KEYCODE_CAMERA);
-                    mTapPending = false;
-                    break;
-                case MSG_POLL_RSSI:
-                    mBluetoothGatt.readRemoteRssi();
-                    break;
-                case MSG_TRY_RECONNECT:
-                    connect();
-                    break;
-            }
-        }
-    };
-
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -181,7 +96,6 @@ public class OclickService extends Service implements
             }
         }
     };
-
     private BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, final int newState) {
@@ -214,9 +128,9 @@ public class OclickService extends Service implements
                 gatt.setCharacteristicNotification(keyCharacteristic, true);
 
                 // update connection parameters - TODO: use constants
-                byte[] params = new byte[] {
-                    Oclick2Constants.MSG_CLASS_CONNECTION,
-                    Oclick2Constants.MSG_TYPE_CONNECTION_SET_PARAMS,
+                byte[] params = new byte[]{
+                        Oclick2Constants.MSG_CLASS_CONNECTION,
+                        Oclick2Constants.MSG_TYPE_CONNECTION_SET_PARAMS,
                     /* CONNECTION_INTERVAL_MIN = 200 */ (byte) 0xc8, 0,
                     /* CONNECTION_INTERVAL_MAX = 400 */ (byte) 0x90, 1,
                     /* CONNECTION_LATENCY = 1 */ 1, 0,
@@ -242,7 +156,7 @@ public class OclickService extends Service implements
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt,
-                BluetoothGattCharacteristic characteristic, int status) {
+                                          BluetoothGattCharacteristic characteristic, int status) {
             UUID uuid = characteristic.getService().getUuid();
             Log.d(TAG, "onCharacteristicWrite: service UUID " + uuid + " status " + status);
 
@@ -262,7 +176,7 @@ public class OclickService extends Service implements
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
-                BluetoothGattCharacteristic characteristic) {
+                                            BluetoothGattCharacteristic characteristic) {
             Log.d(TAG, "Characteristic changed " + characteristic.getUuid());
 
             if (characteristic.getUuid().equals(OCLICK2_KEY_CHARACTERISTIC_UUID)) {
@@ -317,6 +231,23 @@ public class OclickService extends Service implements
             }
             if (mRssiAlertEnabled) {
                 mHandler.sendEmptyMessageDelayed(MSG_POLL_RSSI, RSSI_POLL_INTERVAL);
+            }
+        }
+    };
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_SINGLE_TAP_TIMEOUT:
+                    injectKey(KeyEvent.KEYCODE_CAMERA);
+                    mTapPending = false;
+                    break;
+                case MSG_POLL_RSSI:
+                    mBluetoothGatt.readRemoteRssi();
+                    break;
+                case MSG_TRY_RECONNECT:
+                    connect();
+                    break;
             }
         }
     };
@@ -434,10 +365,10 @@ public class OclickService extends Service implements
         long now = SystemClock.uptimeMillis();
         InputManager im = InputManager.getInstance();
         im.injectInputEvent(new KeyEvent(now, now, KeyEvent.ACTION_DOWN, keyCode,
-                0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD),
+                        0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD),
                 InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
         im.injectInputEvent(new KeyEvent(now, now, KeyEvent.ACTION_UP, keyCode,
-                0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD),
+                        0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0, InputDevice.SOURCE_KEYBOARD),
                 InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
     }
 
@@ -456,7 +387,7 @@ public class OclickService extends Service implements
         BluetoothGattCharacteristic alertCharacteristic =
                 alertService.getCharacteristic(IMMEDIATE_ALERT_CHARACTERISTIC_UUID);
 
-        alertCharacteristic.setValue(new byte[] { (byte) (doAlert ? 2 : 0) });
+        alertCharacteristic.setValue(new byte[]{(byte) (doAlert ? 2 : 0)});
         mBluetoothGatt.writeCharacteristic(alertCharacteristic);
     }
 
@@ -467,7 +398,7 @@ public class OclickService extends Service implements
         BluetoothGattCharacteristic characteristic =
                 service.getCharacteristic(LINK_LOSS_CHARACTERISTIC_UUID);
 
-        characteristic.setValue(new byte[] { (byte) (alert ? 2 : 0) });
+        characteristic.setValue(new byte[]{(byte) (alert ? 2 : 0)});
         mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
@@ -503,5 +434,65 @@ public class OclickService extends Service implements
         }
 
         startForeground(1000, builder.build());
+    }
+
+    private enum ConnectionState {
+        INIT,
+        CONNECTED,
+        RECONNECTING
+    }
+
+    private static final class Oclick2Constants {
+        private static final int MSG_CLASS_CALL = 1;
+        private static final int MSG_CLASS_MESSAGE = 2;
+        private static final int MSG_CLASS_LED = 3;
+        private static final int MSG_CLASS_KEY = 5;
+        private static final int MSG_CLASS_CONNECTION = 7;
+        private static final int MSG_CLASS_LINKLOSE = 8;
+        private static final int MSG_CLASS_RSSI = 11;
+
+        /* payload: count (16 bit integer) */
+        private static final int MSG_TYPE_CALL_SET_INCOMING = 1;
+        private static final int MSG_TYPE_CALL_SET_MISSED = 2;
+        private static final int MSG_TYPE_CALL_SET_READ = 3;
+
+        /* payload: count (16 bit integer) */
+        private static final int MSG_TYPE_MESSAGE_UNREAD = 1;
+        private static final int MSG_TYPE_MESSAGE_READ = 2;
+
+        /* payload: color bitmask (1 byte, white = 1, red = 2, green = 4, blue = 8) */
+        private static final int MSG_TYPE_LED_ON = 1;
+        private static final int MSG_TYPE_LED_FLASH = 2;
+        private static final int MSG_TYPE_LED_OFF = 3;
+
+        /* payload:
+         * CONNECTION_INTERVAL_MIN (16 bit integer),
+         * CONNECTION_INTERVAL_MAX (16 bit integer),
+         * CONNECTION_LATENCY (16 bit integer),
+         * SUPERVISION_TIMEOUT (16 bit integer)
+         */
+        private static final int MSG_TYPE_CONNECTION_GET_PARAMS = 1;
+        private static final int MSG_TYPE_CONNECTION_SET_PARAMS = 2;
+
+        /* payload: level (1 byte, off = 0, on = 1) */
+        private static final int MSG_TYPE_LINKLOSE_GET_LEVEL = 1;
+        private static final int MSG_TYPE_LINKLOSE_SET_LEVEL = 2;
+
+        private static final int MSG_TYPE_RSSI_READ_RATE_GET = 1;
+        private static final int MSG_TYPE_RSSI_READ_RATE_SET = 2;
+        private static final int MSG_TYPE_RSSI_GET = 3;
+
+        private static final int KEYCODE_MIDDLE = 0x10;
+        private static final int KEYCODE_UP = 0x20;
+        private static final int KEYCODE_RIGHT = 0x30;
+        private static final int KEYCODE_DOWN = 0x40;
+        private static final int KEYCODE_LEFT = 0x50;
+        private static final int KEYCODE_MASK = 0xf0;
+
+        private static final int KEYTYPE_LONG_RELEASE = 0;
+        private static final int KEYTYPE_SHORT = 1;
+        private static final int KEYTYPE_DOUBLE = 2;
+        private static final int KEYTYPE_LONG_PRESS = 3;
+        private static final int KEYTYPE_MASK = 0xf;
     }
 }
