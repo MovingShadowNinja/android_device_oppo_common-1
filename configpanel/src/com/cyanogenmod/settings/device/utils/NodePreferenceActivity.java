@@ -25,7 +25,7 @@ import android.preference.SwitchPreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
-import org.cyanogenmod.internal.util.ScreenType;
+import com.cyanogenmod.settings.device.utils.ScreenType;
 
 import java.io.File;
 
